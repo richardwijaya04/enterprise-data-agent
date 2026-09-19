@@ -1,0 +1,34 @@
+# Operating System (macOS)
+.DS_Store
+
+# IDEs & Editors
+.vscode/
+.idea/
+
+# Environment Variables
+.env
+
+# Python & Bytecode Caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+
+# Build & Distribution
+build/
+dist/
+wheels/
+*.egg-info/
+
+# Testing & Linting Caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local Database & Analytics Artifacts
+*.duckdb
+*.duckdb.wal

@@ -1,0 +1,42 @@
+[project]
+name = "enterprise-data-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Richard", email = "richardwijayaharianto@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=1.5.5",
+    "fastmcp>=4.0.5",
+    "mcp>=2.2.0",
+    "pydantic>=2.13.5",
+]
+
+[project.scripts]
+enterprise-data-agent = "enterprise_data_agent:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.8",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=src"
+testpaths = ["tests"]
+pythonpath = ["src"]
