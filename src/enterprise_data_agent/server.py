@@ -20,7 +20,8 @@ def validate_table_schema(
     Args:
         database_path (str): Path to the DuckDB database file.
         table_name (str): Name of the table to validate.
-        expected_columns (dict[str, str]): A dictionary where keys are column names and values are
+        expected_columns (dict[str, str]): 
+            A dictionary where keys are column names and values are
     """
     con = duckdb.connect(database=database_path)
     try:
@@ -35,10 +36,11 @@ def validate_table_schema(
         return report.model_dump()
     finally:
         con.close()
-        
+
+
 @mcp.tool()
 def sanitize_sensitive_payload(raw_text: str) -> dict:
-    """ Scan the input text for PII from payload and mask it. """
+    """Scan the input text for PII from payload and mask it."""
     result = scan_and_mask_pii(raw_text)
     return result.model_dump()
 

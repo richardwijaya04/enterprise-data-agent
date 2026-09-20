@@ -4,11 +4,12 @@ import duckdb
 
 DATA_DIR = Path("data")
 
+
 def generate_mock_datasets() -> None:
-    """ Generate sample Paquet datasets for multi-industry """
+    """Generate sample Paquet datasets for multi-industry"""
     DATA_DIR.mkdir(exist_ok=True)
     con = duckdb.connect(database=":memory:")
-    
+
     # 1. Tech / E-commerce dataset (user activity logs)
     con.execute("""
        CREATE TABLE tech_events AS SELECT * FROM (
@@ -21,7 +22,7 @@ def generate_mock_datasets() -> None:
     con.execute(
         f"COPY tech_events TO '{DATA_DIR} / 'tech_events.parquet' (FORMAT PARQUET);"
     )
-    
+
     # 2. FMCG / Retail Dataset (Inventory & Stock Analytics)
     con.execute("""
         CREATE TABLE fmcg_inventory AS SELECT * FROM (
@@ -36,6 +37,7 @@ def generate_mock_datasets() -> None:
     )
 
     con.close()
+
 
 if __name__ == "__main__":
     generate_mock_datasets()
