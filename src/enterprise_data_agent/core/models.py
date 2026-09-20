@@ -32,3 +32,19 @@ class PIIScanResult(BaseModel):
     entities_count: int
     detected_entities: list[PIIEntity]
     sanitized_text: str
+
+
+# Automated Data Quality Profiler
+class ColumnQualityMetric(BaseModel):
+    column_name: str
+    total_count: int
+    null_count: int
+    null_percentage: float
+
+
+class DataQualityReport(BaseModel):
+    table_name: str
+    total_rows: int
+    total_duplicates: int
+    column_metrics: list[ColumnQualityMetric]
+    quality_score: float

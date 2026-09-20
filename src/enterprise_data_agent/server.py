@@ -3,6 +3,7 @@ from fastmcp import FastMCP
 
 from enterprise_data_agent.core.models import ColumnSchema, TableContract
 from enterprise_data_agent.tools.pii_guard import scan_and_mask_pii
+from enterprise_data_agent.tools.quality_profiler import profile_table_quality
 from enterprise_data_agent.tools.schema_inspector import inspect_schema_drift
 
 # Inisialisasi Server MCP
@@ -20,7 +21,7 @@ def validate_table_schema(
     Args:
         database_path (str): Path to the DuckDB database file.
         table_name (str): Name of the table to validate.
-        expected_columns (dict[str, str]): 
+        expected_columns (dict[str, str]):
             A dictionary where keys are column names and values are
     """
     con = duckdb.connect(database=database_path)
@@ -43,6 +44,17 @@ def sanitize_sensitive_payload(raw_text: str) -> dict:
     """Scan the input text for PII from payload and mask it."""
     result = scan_and_mask_pii(raw_text)
     return result.model_dump()
+
+
+@mcp.tool()
+def inspect_data_quality(database_path: str, table_name: str) -> dict:
+    """Analyze null ratio, duplication row, and quality score of table"""
+    con = duckdb.connect(database=database_path)
+    try:
+        report = profile_table_quality(con, table_name)
+        return report.model_dump()
+    finally:
+        con.close()
 
 
 if __name__ == "__main__":
