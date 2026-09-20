@@ -1,6 +1,9 @@
 import duckdb
 
-from enterprise_data_agent.server import validate_table_schema
+from enterprise_data_agent.server import (
+    sanitize_sensitive_payload,
+    validate_table_schema,
+)
 
 
 def test_validate_table_schema_tool(tmp_path):
@@ -28,3 +31,11 @@ def test_validate_table_schema_tool(tmp_path):
     assert "signup_date" in result["unexpected_columns"]
     assert len(result["missing_columns"]) == 0
     
+def test_sanitize_sensitive_payload_tool():
+    payload = "Direct user inquiry from customer support: contact dev@bank.com immediately."
+    result = sanitize_sensitive_payload(payload)
+    
+    assert result["has_pii"] is True
+    assert result["entities_count"] == 1
+    assert "dev@bank.com" not in result["sanitized_text"]
+    assert "[EMAIL REDACTED]" in result["sanitized_text"]

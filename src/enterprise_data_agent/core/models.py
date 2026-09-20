@@ -17,3 +17,15 @@ class SchemaDriftReport(BaseModel):
     missing_columns: list[str] = Field(default_factory=list)
     unexpected_columns: list[str] = Field(default_factory=list)
     type_mismatches: dict[str, dict[str, str]] = Field(default_factory=dict)
+    
+# Privacy Data
+class PIIEntity(BaseModel):
+    entity_type: str
+    original_value: str
+    masked_value: str
+
+class PIIScanResult(BaseModel):
+    has_pii: bool
+    entities_count: int
+    detected_entities: list[PIIEntity]
+    sanitized_text: str

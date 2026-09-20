@@ -2,6 +2,7 @@ import duckdb
 from fastmcp import FastMCP
 
 from enterprise_data_agent.core.models import ColumnSchema, TableContract
+from enterprise_data_agent.tools.pii_guard import scan_and_mask_pii
 from enterprise_data_agent.tools.schema_inspector import inspect_schema_drift
 
 # Inisialisasi Server MCP
@@ -34,6 +35,12 @@ def validate_table_schema(
         return report.model_dump()
     finally:
         con.close()
+        
+@mcp.tool()
+def sanitize_sensitive_payload(raw_text: str) -> dict:
+    """ Scan the input text for PII from payload and mask it. """
+    result = scan_and_mask_pii(raw_text)
+    return result.model_dump()
 
 
 if __name__ == "__main__":
