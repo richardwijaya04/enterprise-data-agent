@@ -1,43 +1,34 @@
-from pathlib import Path
-
 import duckdb
 
-DATA_DIR = Path("data")
 
+def generate_mock_warehouse(db_path: str = "enterprise_warehouse.duckdb") -> None:
+    """Make baseline warehouse."""
+    con = duckdb.connect(database=db_path)
 
-def generate_mock_datasets() -> None:
-    """Generate sample Paquet datasets for multi-industry"""
-    DATA_DIR.mkdir(exist_ok=True)
-    con = duckdb.connect(database=":memory:")
-
-    # 1. Tech / E-commerce dataset (user activity logs)
+    # 1. Tabel Transaksi Bersih (Baseline)
     con.execute("""
-       CREATE TABLE tech_events AS SELECT * FROM (
-           VALUES
-                (101, 'user_click', '2026-09-01 10:00:00', 'US', NULL),
-                (102, 'checkout', '2026-09-01 10:05:00', 'AU', 'user_102@email.com'),
-                (103, 'page_view', 'invalid_date', 'SG', 'user_103@email.com')
-       )   AS t(user_id, event_type, timestamp, country, email);
+        CREATE OR REPLACE TABLE clean_transactions AS
+        SELECT 
+            'TXN_' || LPAD(range::VARCHAR, 5, '0') AS transaction_id,
+            'USR_' || LPAD((range % 50)::VARCHAR, 4, '0') AS user_id,
+            ROUND(random() * 1000 + 10, 2) AS amount,
+            CURRENT_DATE - (range % 30) AS transaction_date
+        FROM range(100);
     """)
-    con.execute(
-        f"COPY tech_events TO '{DATA_DIR} / 'tech_events.parquet' (FORMAT PARQUET);"
-    )
 
-    # 2. FMCG / Retail Dataset (Inventory & Stock Analytics)
+    # 2. Tabel Rusak: Mengalami Schema Drift & Nilai Rusak
     con.execute("""
-        CREATE TABLE fmcg_inventory AS SELECT * FROM (
-            VALUES 
-                ('SKU-001', 'UHT Milk 1L', 500, 15.00, '2026-12-31'),
-                ('SKU-002', 'Chocolate Biscuits', -10, 8.00, '2026-10-15'),
-                ('SKU-003', 'Cooking Oil 2L', 200, NULL, '2027-01-01')
-        ) AS t(sku, product_name, stock_qty, unit_price, expiry_date);
+        CREATE OR REPLACE TABLE drifted_orders AS
+        SELECT 
+            'ORD_' || LPAD(range::VARCHAR, 5, '0') AS order_id,
+            CASE WHEN range % 5 = 0 THEN NULL ELSE 'CUST_' || range END AS customer_ref,
+            (random() * 500)::INTEGER AS amount -- Tipe INTEGER, bukan DOUBLE
+        FROM range(50);
     """)
-    con.execute(
-        f"COPY fmcg_inventory TO '{DATA_DIR}/fmcg_inventory.parquet' (FORMAT PARQUET);"
-    )
 
     con.close()
 
 
 if __name__ == "__main__":
-    generate_mock_datasets()
+    generate_mock_warehouse()
+    print("Mock database created successfully.")
